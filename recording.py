@@ -33,7 +33,7 @@ detector = dlib.get_frontal_face_detector()
 dlib_shape_predictor = dlib.shape_predictor(predictor_path)
 facerec = dlib.face_recognition_model_v1(face_rec_model_path)\
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 saving_data = False
 
@@ -42,7 +42,7 @@ temp_data=[]
 while (True):
 
 	name = str(raw_input("Enter your name:  "))
-	directory = tdatabase_dir+name+'/'
+	directory = database_dir+name+'/'
 
 	if not os.path.exists(directory):
 		dir_list = os.listdir(database_dir)
