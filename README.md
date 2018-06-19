@@ -17,7 +17,7 @@
 
 ## Procedure
 
-###Install Python 2.7
+### Install Python 2.7
 
 ```
 sudo apt-get install python-dev python-pip
