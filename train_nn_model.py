@@ -59,7 +59,7 @@ face_rec_model_path='dlib_model/dlib_face_recognition_resnet_model_v1.dat'
 
 # The input directory of positive and negative person's facial data
 pos_image_dir='face_db/'
-neg_image_dir='unknown_face/'
+neg_image_dir='unknown_face_db/'
 
 
 # Keras neural network model learning parameter
@@ -117,7 +117,7 @@ def train_model(model,
 				test_label,
 				nb_epoch=100):
 	
-	checkpointer = ModelCheckpoint(filepath=nn_model_dir+hdf5_filename,
+	checkpointer = ModelCheckpoint(filepath=model_dir+hdf5_filename,
 								   verbose=1,
 								   save_best_only=True)
 
@@ -154,13 +154,13 @@ print 'Building neural network architecture...'
 if not continue_training:
 	neural_model = build_model(nb_class)
 else:
-	json_model_file=open(model_dir+json_filename, 'rb')
+	json_model_file=open(model_dir+json_filename, 'r')
 	json_model = json_model_file.read()
 	json_model_file.close()
 
 	neural_model = model_from_json(json_model)
 
-	neural_model.load_weights(nn_model_dir+hdf5_filename)
+	neural_model.load_weights(model_dir+hdf5_filename)
 
 	neural_model.compile(loss=loss,
 				  optimizer=optimizer,
@@ -174,7 +174,7 @@ class_counter=0
 for person in known_person_list:
 	print 'Processing %s data.....'%(person)
 	label_dict[class_counter]=person
-	a=  person
+	a= person
 	print a
 	with open(pos_image_dir+a+'/face_descriptor.pkl', 'rb') as f:
 	#with open(pos_image_dir+person.encode('utf-8')+'/face_descriptor.pkl', 'rb') as f:
@@ -201,7 +201,7 @@ print 'Finished...'
 
 print 'Processing UNKNOWN face data'
 label_dict[class_counter] = 'UNKNOWN'
-joblib.dump(label_dict,nn_model_dir+labeldict_filename)
+joblib.dump(label_dict,model_dir+labeldict_filename)
 if not use_preprocessed_neg_data:
 	stranger_list = os.listdir(neg_image_dir+'raw_data/')
 
