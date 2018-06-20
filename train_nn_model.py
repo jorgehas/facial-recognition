@@ -21,6 +21,7 @@ from keras.layers.core import Dense, Dropout, Activation, Flatten
 from keras.layers.convolutional import Convolution2D, MaxPooling2D
 from keras.callbacks import ModelCheckpoint
 from keras.layers.advanced_activations import ELU
+from keras import losses
 
 from keras.utils import np_utils
 from keras.optimizers import SGD,RMSprop,adam
@@ -90,8 +91,7 @@ def build_model(nb_class):
 	model.add(Dense(nb_class))
 	model.add(Activation('softmax'))
 
-	
-	model.compile(loss=loss,
+	model.compile(loss=losses.mean_squared_error,
 				  optimizer=optimizer,
 				  metrics=['accuracy'])
 	
@@ -166,12 +166,12 @@ else:
 				  optimizer=optimizer,
 				  metrics=['accuracy'])
 
-print 'Processing AUTHORIZED person data...'
+print 'Processing known person data...'
 
 label_dict=dict()
 class_counter=0
 
-for person in authorized_person_list:
+for person in known_person_list:
 	print 'Processing %s data.....'%(person)
 	label_dict[class_counter]=person
 	a=  person
