@@ -36,4 +36,22 @@ pip install pillow
 pip install h5py
 pip install keras
 ```
+### Recording a face from a live video camera
+To record a human face, run the following script:
+```
+$ python recording.py
+```
+### Train the model
+
+To train the model run this script:
+```
+$ python train_nn_model.py
+```
+### Face recognition
+
+To recognize a face, run the following script:
+
+```
+$ python face_recognition.py
+```
 
