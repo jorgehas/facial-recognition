@@ -156,16 +156,12 @@ class put_chinese_text(object):
 					img[y_pos + row][x_pos + col][1] = color[1]
 					img[y_pos + row][x_pos + col][2] = color[2]
 
-
-input_data = 'cam'
-
-# If input_data set to 'video', define the video file path
-video_file = ''
+input_data = 'camera'
 
 # Set tolerance for face detection smaller means more tolerance for example -0.5 compared with 0
 tolerance = -0.5
 
-# gather data to reinforced model !!! CAN BE ACTIVATED WHILE SCRIPT ACTIVE BY PRESSING 'R'
+# Acquire face data 
 acquire_data= False
 person_name_list = [ ]
 
@@ -222,7 +218,7 @@ cap.set(4, 240)
 start = time.time()
 facerec = dlib.face_recognition_model_v1(face_rec_model_path)
 global trackingFace
-if input_data == 'cam':
+if input_data == 'camera':
 
 	while (True):
 		ret, frame = cap.read()
