@@ -25,7 +25,7 @@ from cPickle import dump, load, HIGHEST_PROTOCOL
 import sys
 import pickle
 import codecs
-import freetype
+#import freetype
 import copy
 import pdb
 import threading
@@ -158,10 +158,6 @@ class put_chinese_text(object):
 
 
 input_data = 'cam'
-# font = ImageFont.truetype ('/usr/share/fonts/truetype/wqy/wqy-microhei.ttc', 20)
-# font = ImageFont.truetype("chfont.ttf", 50)
-# If input_data set to 'image', define the image file path
-image_file = ''
 
 # If input_data set to 'video', define the video file path
 video_file = ''
@@ -188,8 +184,7 @@ face_rec_model_path = 'dlib_face_recognition_resnet_model_v1.dat'
 
 # .pkl file containing dictionary information about person's label corresponding with neural network output data
 label_dict = joblib.load(model_dir + labeldict_filename)
-# with codecs.open(model_dir+labeldict_filename, 'r') as f:
-#	label_dict =  pickle.load(f)
+
 # ML Parameters
 
 batch_size = 150
@@ -212,8 +207,7 @@ json_model_file.close()
 cnn_model = model_from_json(json_model)
 cnn_model.load_weights(model_dir + hdf5_filename)
 end = time.time()
-total_time = end - beg
-print 'detection took', total_time
+
 cnn_model.compile(loss=loss,
 				  optimizer=sgd,
 				  metrics=['accuracy'])
@@ -221,29 +215,21 @@ cnn_model.compile(loss=loss,
 tracker = dlib.correlation_tracker()
 detector = dlib.get_frontal_face_detector()
 sp = dlib.shape_predictor(predictor_path)
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 cap.set(3, 340)
 cap.set(4, 240)
 
 start = time.time()
 facerec = dlib.face_recognition_model_v1(face_rec_model_path)
-# fps_1 = cap.get(cv2.CAP_PROP_FPS)
-# size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)),int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-# videoWriter = cv2.VideoWriter('faceDemo.avi', cv2.VideoWriter_fourcc('I','4','2','0'), fps_1, size)
 global trackingFace
 if input_data == 'cam':
 
 	while (True):
 		ret, frame = cap.read()
-		# if ret == True:
-		#	frame = cv2.flip(frame, 0)
 		start = time.time()
-
-		# draw = ImageDraw.Draw(frame)
-
+	
 		detects, scores, idx = detector.run(frame, 0, tolerance)
-		# tracker.start_track(frame, detects[2])
-		# win.add_overlay(tracker.get_position())
+		
 		for i, d in enumerate(detects):
 
 			if idx[i] == 0 or idx[i] == 1 or idx[i] == 2 or idx[i] == 3 or idx[i] == 4:
@@ -253,8 +239,6 @@ if input_data == 'cam':
 				bb1 = dlib.rectangle(int(bb1.left()), int(d.top()), int(d.right()), int(d.bottom()))
 				bb = [bb1]
 				tracker.start_track(frame, dlib.rectangle(bb[0].left(), bb[0].top(), bb[0].right(), bb[0].bottom()))
-
-				# cv2.rectangle(frame,(d.left(),d.top()),(d.right(),d.bottom()),(255,0,0),2)
 				shape = sp(frame, d)
 				face_descriptor = np.array([facerec.compute_face_descriptor(frame, shape)])
 				end_descriptor = time.time()
@@ -276,7 +260,6 @@ if input_data == 'cam':
 						face_label_name = label_dict[label]
 
 						if face_label_name in person_name_list and acquire_data:
-							#print face_label_name
 							temp_data[face_label_name]['data'] = np.append(temp_data[face_label_name]['data'], face_descriptor,
 																	axis=0)
 							temp_data[face_label_name]['count'] += 1
@@ -292,7 +275,6 @@ if input_data == 'cam':
 						label = label_dict[counter]
 						label_prob = prob
 						face_label_name = label
-						#print face_label_name
 					counter += 1
 
 				font = cv2.FONT_HERSHEY_DUPLEX
@@ -301,36 +283,17 @@ if input_data == 'cam':
 				pos = (d.left() - 240, d.bottom() - 240)
 				text_size = 36
 
-			#	if label != 'UNKNOWN':
-					#cv2.rectangle(frame, (d.left(), d.top()), (d.right(), d.bottom()), (0, 0, 255), 2)
-					#cv2.rectangle(frame, (d.left(), d.bottom() - 45), (d.right(), d.bottom()), (0, 0, 255), cv2.FILLED)
-					#ft = put_chinese_text('wqy-zenhei.ttc')
-					#frame = ft.draw_text(frame, pos, face_label_name, text_size, color_)
-
-				p = subprocess.Popen(["ekho", face_label_name],
-									 shell=False,
-									 stdout=subprocess.PIPE,
-									 stderr=subprocess.PIPE)
-				stdout, stderr = p.communicate()
+				if label != 'UNKNOWN':
+					cv2.rectangle(frame, (d.left(), d.top()), (d.right(), d.bottom()), (0, 0, 255), 2)
+					cv2.rectangle(frame, (d.left(), d.bottom() - 45), (d.right(), d.bottom()), (0, 0, 255), cv2.FILLED)
+					
 
 				thread = MyThread()
 				thread.start()
 				
 
-		#cv2.namedWindow('face detect', flags=cv2.WINDOW_NORMAL)
-		#cv2.imshow('face detect', frame)
-		#if cv2.waitKey(1) & 0xFF == ord('r'):
-		#	if acquire_data== True:
-		#		acquire_data= False
-		#	else:
-		#		acquire_data= True
-
-		#delta = time.time() - start
-		#fps = float(1) / float(delta)
-	# print(fps)
-
-	# When everything done, release the capture
+		cv2.namedWindow('face detect', flags=cv2.WINDOW_NORMAL)
+		cv2.imshow('face detect', frame)
+		
 cap.release()
-# videoWriter.release()
-#del draw
-#cv2.destroyAllWindows()
+cv2.destroyAllWindows()
